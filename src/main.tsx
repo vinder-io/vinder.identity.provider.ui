@@ -7,13 +7,16 @@ import AppRoutes from "./routes/routes.tsx"
 
 import { AuthenticationStateProvider } from "./contexts/authentication-context.tsx"
 import { AuthorizationStateProvider } from "./contexts/authorization-context.tsx"
+import { TenantProvider } from "./contexts/tenant-context.tsx"
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <AuthenticationStateProvider>
             <AuthorizationStateProvider>
-                <Toaster position="bottom-right" />
-                <AppRoutes />
+                <TenantProvider>
+                    <Toaster position="bottom-right" />
+                    <AppRoutes />
+                </TenantProvider>
             </AuthorizationStateProvider>
         </AuthenticationStateProvider>
     </StrictMode>

@@ -5,6 +5,7 @@ import { User, Key, Users, Layers, Settings, BookOpen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "../user-avatar";
+import { TenantSwitcher } from "../tenant-switcher";
 import { useAuthenticationState } from "@/contexts/authentication-context";
 
 import { JwtParser } from "@/utils/jwt-parser";
@@ -73,6 +74,8 @@ export function Header() {
                         </Button>
                     </a>
                 ))}
+
+                <TenantSwitcher />
                 <UserAvatar userName={user?.username!} />
             </div>
         </header>
