@@ -20,14 +20,24 @@ const AuthorizationContext = createContext<AuthorizationStateContextParameters |
 export const AuthorizationStateProvider = ({ children }: { children: ReactNode }) => {
     const { accessToken } = useAuthenticationState();
 
-    const [permissions, setPermissions] = useState<string[]>([]);
-    const [groups, setGroups] = useState<string[]>([]);
+    const cachedPermissions = sessionStorage.getItem("permissions");
+    const cachedGroups = sessionStorage.getItem("groups");
+
+    const [permissions, setPermissions] = useState<string[]>(cachedPermissions ? JSON.parse(cachedPermissions) : []);
+    const [groups, setGroups] = useState<string[]>(cachedGroups ? JSON.parse(cachedGroups) : []);
 
     useEffect(() => {
-        // We call this "metadata" because it represents user-related authorization data,
+        // we call this "metadata" because it represents user-related authorization data,
         // such as permissions and groups, which are essentially metadata about the user's access rights.
-        loadAuthorizationMetadata(accessToken, setPermissions, setGroups);
+
+        if (!permissions.length || !groups.length) {
+            loadAuthorizationMetadata(accessToken, setPermissions, setGroups);
+        }
+
     }, [accessToken]);
+
+    useEffect(() => { sessionStorage.setItem("permissions", JSON.stringify(permissions)) }, [permissions]);
+    useEffect(() => { sessionStorage.setItem("groups", JSON.stringify(groups)) }, [groups]);
 
     const hasPermission = (permission: string) => permissions.includes(permission);
     const hasGroup = (group: string) => groups.includes(group);
