@@ -7,8 +7,8 @@ export class IdentityClient {
     public static async authenticate(credentials: AuthenticationCredentials): Promise<Result<AuthenticationResponse>> {
         const httpMessage = {
             method: "POST",
-            url: "http://vinder-io-identity-provider.somee.com/api/v1/identity/authenticate",
-            headers: { "Content-Type": "application/json", "X-Tenant": "master" },
+            url: `${import.meta.env.VITE_IDENTITY_PROVIDER_URI}/identity/authenticate`,
+            headers: { "Content-Type": "application/json", "X-Tenant": `${import.meta.env.VITE_DEFAULT_TENANT}` },
             body: JSON.stringify(credentials)
         };
 
