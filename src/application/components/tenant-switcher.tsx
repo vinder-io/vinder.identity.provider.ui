@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Layers } from "lucide-react";
 
 import { useEffect, useState } from "react";
-import { useTenant } from "@/contexts/tenant-context";
 
 import type { TenantDetails } from "@/types/tenant/tenant-details";
+import { tenantStore } from "@/stores/tenant/tenant-store";
 
 
 const styles = {
@@ -18,7 +18,7 @@ const styles = {
 }
 
 export function TenantSwitcher() {
-    const { setTenant } = useTenant();
+    const setTenant = tenantStore((state) => state.setTenant);
 
     const [tenants, setTenants] = useState<TenantDetails[]>([]);
     const [selectedTenant, setSelectedTenant] = useState<TenantDetails | null>(null);
@@ -35,7 +35,7 @@ export function TenantSwitcher() {
                 );
 
                 setSelectedTenant(masterTenant ?? result.data.items[0]);
-                setTenant(masterTenant ?? result.data.items[0]);
+                setTenant((masterTenant ?? result.data.items[0]).name);
             }
         };
 
@@ -46,7 +46,7 @@ export function TenantSwitcher() {
         const tenant = tenants.find(where => where.id === tenantId);
         if (tenant) {
             setSelectedTenant(tenant);
-            setTenant(tenant);
+            setTenant(tenant.name);
         }
     };
 
