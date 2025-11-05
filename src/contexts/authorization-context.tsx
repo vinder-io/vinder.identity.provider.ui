@@ -65,7 +65,7 @@ async function loadAuthorizationMetadata(
     if (!user)
         return;
 
-    const result = await UsersClient.getUserGroups(user.id);
+    const result = await UsersClient.getUserGroupsAsync(user.id);
 
     if (result.isSuccess && result.data) {
         const groupNames = Array.isArray(result.data) ? result.data.map(group => group.name) : [result.data.name];
