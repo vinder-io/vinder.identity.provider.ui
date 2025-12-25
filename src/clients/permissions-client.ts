@@ -3,6 +3,7 @@ import httpClient from "@/lib/http-client";
 import type { Permission } from "@/types/identity/permission";
 import type { Pagination } from "@/types/common/pagination";
 import type { PermissionsFetchParameters } from "@/types/permissions/permissions-fetch-parameters";
+import type { PermissionCreationScheme } from "@/types/permissions/permission-creation-scheme";
 
 import { Result } from "@/types/common/result";
 import { QueryParametersParser } from "@/utils/query-parameters-parser";
@@ -16,6 +17,15 @@ export class PermissionsClient {
             return Result.success<Pagination<Permission>>(response.data);
         } catch (error: any) {
             return Result.failure<Pagination<Permission>>(error.response?.data);
+        }
+    }
+
+    public static async createPermissionAsync(scheme: PermissionCreationScheme): Promise<Result<Permission>> {
+        try {
+            const response = await httpClient.post<Permission>("/permissions", scheme);
+            return Result.success<Permission>(response.data);
+        } catch (error: any) {
+            return Result.failure<Permission>(error.response?.data);
         }
     }
 }
