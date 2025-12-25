@@ -1,5 +1,5 @@
 import { MainLayout } from "@/application/components/shared/main-layout";
-import { PermissionsTable } from "./components/permissions-table";
+import { PermissionsContent } from "./components/permissions-content";
 import { usePermissions } from "./hooks/use-permissions";
 
 export default function PermissionsPage() {
@@ -13,9 +13,7 @@ export default function PermissionsPage() {
 
   return (
     <MainLayout>
-      <div className="max-w-4xl mx-auto py-10">
-        <PermissionsTable permissions={permissions} />
-      </div>
+      <PermissionsContent permissions={permissions} />
     </MainLayout>
   );
 }
