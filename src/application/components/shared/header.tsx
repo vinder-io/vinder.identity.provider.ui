@@ -2,6 +2,7 @@ import logo from "@/assets/logo.svg";
 
 import { useEffect, useState } from "react";
 import { User, Key, Users, Layers, Settings, BookOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "../user-avatar";
@@ -12,10 +13,10 @@ import { JwtParser } from "@/utils/jwt-parser";
 import type { UserDetails } from "@/types/identity/user-details";
 
 const navigationItems = [
-    { id: "users", label: "Users", icon: User, active: true },
-    { id: "permissions", label: "Permissions", icon: Key, active: false },
-    { id: "groups", label: "Groups", icon: Users, active: false },
-    { id: "tenants", label: "Tenants", icon: Layers, active: false },
+    { id: "users", label: "Users", icon: User, active: true, route: "/users" },
+    { id: "permissions", label: "Permissions", icon: Key, active: false, route: "/permissions" },
+    { id: "groups", label: "Groups", icon: Users, active: false, route: "/groups" },
+    { id: "tenants", label: "Tenants", icon: Layers, active: false, route: "/tenants" },
 ];
 
 const utilityItems = [
@@ -42,6 +43,7 @@ const styles = {
 export function Header() {
     const { accessToken } = useAuthenticationState();
     const [user, setUser] = useState<UserDetails | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         setUser(JwtParser.getUserDetails(accessToken));
@@ -55,8 +57,13 @@ export function Header() {
                 </div>
                 <nav className={styles.nav}>
                     {navigationItems.map((item) => (
-                        <Button key={item.id} variant="ghost" size="sm"
-                            className={`${styles.navButton} ${item.active ? styles.navButtonActive : styles.navButtonInactive}`}>
+                        <Button
+                            key={item.id}
+                            variant="ghost"
+                            size="sm"
+                            className={`${styles.navButton} ${item.active ? styles.navButtonActive : styles.navButtonInactive}`}
+                            onClick={() => item.route && navigate(item.route)}
+                        >
                             <item.icon className={styles.icon} />
                             <span>{item.label}</span>
                         </Button>
