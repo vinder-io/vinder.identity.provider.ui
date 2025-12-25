@@ -1,6 +1,7 @@
 import { PermissionsTable } from "./permissions-table";
 import { Pagination } from "@/application/components/ui/pagination";
 import { usePermissionsPagination } from "../hooks/use-permissions-pagination";
+import { RegisterPermissionButton } from "./register-permission-button";
 
 const styles = {
   container: "max-w-4xl mx-auto py-10",
@@ -22,9 +23,14 @@ export function PermissionsContent() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.heading}>Manage your permissions</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className={styles.heading}>Manage your permissions</h1>
+        <RegisterPermissionButton />
+      </div>
       <p className={styles.subheading}>
-        Here you can view, create, and manage all the permissions available in your system. Use the table below to explore existing permissions or add new ones as needed.
+        Here you can view, create, and manage all the permissions available in
+        your system. Use the table below to explore existing permissions or add
+        new ones as needed.
       </p>
       <PermissionsTable permissions={permissions} />
       <Pagination
