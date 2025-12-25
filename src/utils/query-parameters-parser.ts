@@ -12,6 +12,34 @@ export class QueryParametersParser {
         for (const [key, value] of entries) {
             if (value === null || value === undefined) continue;
 
+            if (key === 'pagination' && typeof value === 'object') {
+                if (value.pageNumber !== undefined) {
+                    queryString += (first ? '' : '&') + `pagination.pageNumber=${encodeURIComponent(value.pageNumber)}`;
+                    first = false;
+                }
+
+                if (value.pageSize !== undefined) {
+                    queryString += (first ? '' : '&') + `pagination.pageSize=${encodeURIComponent(value.pageSize)}`;
+                    first = false;
+                }
+
+                continue;
+            }
+
+            if (key === 'sort' && typeof value === 'object') {
+                if (value.field !== undefined) {
+                    queryString += (first ? '' : '&') + `sort.field=${encodeURIComponent(value.field)}`;
+                    first = false;
+                }
+
+                if (value.direction !== undefined) {
+                    queryString += (first ? '' : '&') + `sort.direction=${encodeURIComponent(value.direction)}`;
+                    first = false;
+                }
+
+                continue;
+            }
+
             const name = this.toCamelCase(key);
             let stringValue: string;
 
