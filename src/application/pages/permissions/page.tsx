@@ -1,3 +1,4 @@
+import { MainLayout } from "@/application/components/shared/main-layout";
 import { PermissionsTable } from "./components/permissions-table";
 import { usePermissions } from "./hooks/use-permissions";
 
@@ -11,8 +12,10 @@ export default function PermissionsPage() {
   const permissions = data?.data?.items ?? [];
 
   return (
-    <div className="max-w-4xl mx-auto py-10">
-      <PermissionsTable permissions={permissions} />
-    </div>
+    <MainLayout>
+      <div className="max-w-4xl mx-auto py-10">
+        <PermissionsTable permissions={permissions} />
+      </div>
+    </MainLayout>
   );
 }

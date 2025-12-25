@@ -20,7 +20,7 @@ interface PermissionsTableProperties {
   permissions: Permission[];
 }
 
-export function PermissionsTable({ permissions }: PermissionsTableProperties) {
+export function PermissionsTable({ permissions }: Readonly<PermissionsTableProperties>) {
   return (
     <Card className={styles.card}>
       <CardHeader className={styles.cardHeader}>
@@ -30,19 +30,19 @@ export function PermissionsTable({ permissions }: PermissionsTableProperties) {
         <Table className={styles.table}>
           <TableHeader>
             <TableRow>
+              <TableHead className={styles.th}>Identifier</TableHead>
               <TableHead className={styles.th}>Name</TableHead>
               <TableHead className={styles.th}>Description</TableHead>
-              <TableHead className={styles.th}>Identifier</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {permissions.map((permission) => (
               <TableRow key={permission.id}>
-                <TableCell className={styles.td}>{permission.name}</TableCell>
-                <TableCell className={styles.td}>{permission.description}</TableCell>
                 <TableCell className={styles.td}>
                   <Badge className={styles.badge}>{permission.id}</Badge>
                 </TableCell>
+                <TableCell className={styles.td}>{permission.name}</TableCell>
+                <TableCell className={styles.td}>{permission.description}</TableCell>
               </TableRow>
             ))}
           </TableBody>
