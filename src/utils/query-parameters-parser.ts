@@ -24,11 +24,11 @@ export class QueryParametersParser {
 
             stringValue = encodeURIComponent(stringValue);
 
-            if (!first) {
-                queryString += '&';
+            if (first) {
+                first = false;
             }
             else {
-                first = false;
+                queryString += '&';
             }
 
             queryString += `${name}=${stringValue}`;
@@ -38,7 +38,7 @@ export class QueryParametersParser {
     }
 
     private static toCamelCase(value: string): string {
-        if (!value || value.length === 0 || value[0] === value[0].toLowerCase()) {
+        if (!value || value.length === 0 || value.startsWith(value[0].toLowerCase())) {
             return value;
         }
         return value[0].toLowerCase() + value.slice(1);
