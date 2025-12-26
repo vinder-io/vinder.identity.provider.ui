@@ -28,4 +28,22 @@ export class PermissionsClient {
             return Result.failure<Permission>(error.response?.data);
         }
     }
+
+    public static async updatePermissionAsync(id: string, permission: Permission): Promise<Result<Permission>> {
+        try {
+            const response = await httpClient.put<Permission>(`/permissions/${id}`, permission);
+            return Result.success<Permission>(response.data);
+        } catch (error: any) {
+            return Result.failure<Permission>(error.response?.data);
+        }
+    }
+
+    public static async deletePermissionAsync(id: string): Promise<Result<null>> {
+        try {
+            await httpClient.delete(`/permissions/${id}`);
+            return Result.success<null>(null);
+        } catch (error: any) {
+            return Result.failure<null>(error.response?.data);
+        }
+    }
 }

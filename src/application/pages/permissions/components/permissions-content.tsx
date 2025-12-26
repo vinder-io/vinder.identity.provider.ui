@@ -4,7 +4,11 @@ import { Pagination } from "@/application/components/ui/pagination";
 import { usePermissionsPagination } from "../hooks/use-permissions-pagination";
 import { RegisterPermissionButton } from "./register-permission-button";
 import { RegisterPermissionForm } from "./register-permission-form";
+import { EditPermissionForm } from "./edit-permission-form";
+import { DeletePermissionDialog } from "./delete-permission-dialog";
 import { useCreatePermissionMutation, permissionCreationSchema } from "@/hooks/mutations/use-create-permission";
+import { useUpdatePermissionMutation, permissionEditSchema } from "@/hooks/mutations/use-update-permission";
+import { useDeletePermissionMutation } from "@/hooks/mutations/use-delete-permission";
 import { useQueryClient } from "@tanstack/react-query";
 
 const styles = {
@@ -70,6 +74,78 @@ export function PermissionsContent() {
     setTouched(prev => ({ ...prev, [field]: true }));
   };
 
+  const [editOpen, setEditOpen] = useState(false);
+  const [editForm, setEditForm] = useState({ id: "", name: "", description: "" });
+  const [editTouched, setEditTouched] = useState({ name: false, description: false });
+  const [editErrors, setEditErrors] = useState({ name: undefined, description: undefined });
+
+  const updatePermission = useUpdatePermissionMutation({
+    onSuccess: () => {
+      setEditOpen(false);
+      setEditForm({ id: "", name: "", description: "" });
+      setEditTouched({ name: false, description: false });
+      setEditErrors({ name: undefined, description: undefined });
+      queryClient.invalidateQueries({ queryKey: ["permissions"] });
+    },
+    onError: (error: any) => {
+      if (error && typeof error === "object" && error.errors) {
+        setEditErrors(error.errors);
+      }
+    },
+  });
+
+  const handleEdit = (permission: any) => {
+    setEditForm(permission);
+    setEditTouched({ name: false, description: false });
+    setEditErrors({ name: undefined, description: undefined });
+    setEditOpen(true);
+  };
+
+  const handleEditChange = (field: any, value: any) => {
+    setEditForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditBlur = (field: any) => {
+    setEditTouched(prev => ({ ...prev, [field]: true }));
+  };
+
+  const handleEditSubmit = () => {
+    const result = permissionEditSchema.safeParse(editForm);
+    if (!result.success) {
+      const fieldErrors: any = {};
+      result.error.issues.forEach(issue => {
+        const field = issue.path[0];
+        fieldErrors[field] = issue.message;
+      });
+      setEditErrors(fieldErrors);
+      setEditTouched({ name: true, description: true });
+      return;
+    }
+    updatePermission.mutate({ id: editForm.id, data: editForm });
+  };
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+
+  const deletePermission = useDeletePermissionMutation({
+    onSuccess: () => {
+      setDeleteOpen(false);
+      setDeleteTarget(null);
+      queryClient.invalidateQueries({ queryKey: ["permissions"] });
+    },
+  });
+
+  const handleDelete = (permission: { id: string; name: string }) => {
+    setDeleteTarget(permission);
+    setDeleteOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteTarget) {
+      deletePermission.mutate(deleteTarget.id);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className="flex items-center justify-between mb-8">
@@ -81,7 +157,7 @@ export function PermissionsContent() {
         your system. Use the table below to explore existing permissions or add
         new ones as needed.
       </p>
-      <PermissionsTable permissions={permissions} />
+      <PermissionsTable permissions={permissions} onEdit={handleEdit} onDelete={handleDelete} />
       <Pagination
         page={page}
         pageSize={pageSize}
@@ -101,6 +177,24 @@ export function PermissionsContent() {
         onBlur={handleBlur}
         errors={errors}
         touched={touched}
+      />
+      <EditPermissionForm
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        value={editForm}
+        onChange={handleEditChange}
+        onBlur={handleEditBlur}
+        onSubmit={handleEditSubmit}
+        errors={editErrors}
+        touched={editTouched}
+        loading={updatePermission.status === "pending"}
+      />
+      <DeletePermissionDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onConfirm={handleDeleteConfirm}
+        loading={deletePermission.status === "pending"}
+        permissionName={deleteTarget?.name}
       />
     </div>
   );

@@ -11,7 +11,7 @@ const styles = {
   card: "border-0 shadow-none",
   cardHeader: "pb-4 border-b",
   cardTitle: "text-xl font-semibold text-foreground",
-  cardContent: "p-0 overflow-x-hidden",
+  cardContent: "p-0",
   table: "min-w-full",
   th: "px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider",
   td: "px-6 py-4 whitespace-nowrap text-sm text-foreground",
@@ -20,46 +20,50 @@ const styles = {
 
 interface PermissionsTableProperties {
   permissions: Permission[];
+  onEdit?: (permission: Permission) => void;
+  onDelete?: (permission: Permission) => void;
 }
 
-export function PermissionsTable({ permissions }: Readonly<PermissionsTableProperties>) {
-  const { handleEdit, handleDelete } = usePermissionActions();
+export function PermissionsTable({ permissions, onEdit, onDelete }: Readonly<PermissionsTableProperties>) {
+  const { handleDelete } = usePermissionActions();
   return (
     <Card className={styles.card}>
       <CardHeader className={styles.cardHeader}>
         <span className={styles.cardTitle}>Permissions</span>
       </CardHeader>
       <CardContent className={styles.cardContent}>
-        <Table className={styles.table}>
-          <TableHeader>
-            <TableRow>
-              <TableHead className={styles.th}>Identifier</TableHead>
-              <TableHead className={styles.th}>Name</TableHead>
-              <TableHead className={styles.th}>Description</TableHead>
-              <TableHead className={styles.th}>Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {permissions.map((permission) => (
-              <TableRow key={permission.id}>
-                <TableCell className={styles.td}>
-                  <div className="flex items-center gap-1">
-                    <Badge className={styles.badge}>{permission.id}</Badge>
-                    <CopyButton value={permission.id} className="ml-1" />
-                  </div>
-                </TableCell>
-                <TableCell className={styles.td}>{permission.name}</TableCell>
-                <TableCell className={styles.td}>{permission.description}</TableCell>
-                <TableCell className={styles.td}>
-                  <PermissionActions
-                    onEdit={() => handleEdit(permission)}
-                    onDelete={() => handleDelete(permission)}
-                  />
-                </TableCell>
+        <div className="w-full overflow-x-auto">
+          <Table className={styles.table}>
+            <TableHeader>
+              <TableRow>
+                <TableHead className={styles.th}>Identifier</TableHead>
+                <TableHead className={styles.th}>Name</TableHead>
+                <TableHead className={styles.th}>Description</TableHead>
+                <TableHead className={styles.th}>Action</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {permissions.map((permission) => (
+                <TableRow key={permission.id}>
+                  <TableCell className={styles.td}>
+                    <div className="flex items-center gap-1">
+                      <Badge className={styles.badge}>{permission.id}</Badge>
+                      <CopyButton value={permission.id} className="ml-1" />
+                    </div>
+                  </TableCell>
+                  <TableCell className={styles.td}>{permission.name}</TableCell>
+                  <TableCell className={styles.td}>{permission.description}</TableCell>
+                  <TableCell className={styles.td}>
+                    <PermissionActions
+                      onEdit={onEdit ? () => onEdit(permission) : undefined}
+                      onDelete={onDelete ? () => onDelete(permission) : () => handleDelete(permission)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
