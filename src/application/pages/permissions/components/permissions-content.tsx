@@ -4,6 +4,8 @@ import { Pagination } from "@/application/components/ui/pagination";
 import { usePermissionsPagination } from "../hooks/use-permissions-pagination";
 import { RegisterPermissionButton } from "./register-permission-button";
 import { RegisterPermissionForm } from "./register-permission-form";
+import { useCreatePermissionMutation, permissionCreationSchema } from "@/hooks/mutations/use-create-permission";
+import { useQueryClient } from "@tanstack/react-query";
 
 const styles = {
   container: "max-w-4xl mx-auto py-10",
@@ -23,13 +25,49 @@ export function PermissionsContent() {
     setPage,
   } = usePermissionsPagination();
 
+  const queryClient = useQueryClient();
+  const createPermission = useCreatePermissionMutation({
+    onSuccess: () => {
+      setOpen(false);
+      setForm({ name: "", description: "" });
+      setTouched({ name: false, description: false });
+      setErrors({ name: undefined, description: undefined });
+      queryClient.invalidateQueries({ queryKey: ["permissions"] });
+    },
+    onError: (error: any) => {
+      if (error && typeof error === "object" && error.errors) {
+        setErrors(error.errors);
+      }
+    },
+  });
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ name: "", description: "" });
+  const [touched, setTouched] = useState({ name: false, description: false });
+  const [errors, setErrors] = useState({ name: undefined, description: undefined });
 
   const handleRegister = () => {
-    setLoading(true);
-    setLoading(false);
-    setOpen(false);
+    const result = permissionCreationSchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors: any = {};
+      result.error.issues.forEach(issue => {
+        const field = issue.path[0];
+        fieldErrors[field] = issue.message;
+      });
+      setErrors(fieldErrors);
+      setTouched({ name: true, description: true });
+      return;
+    }
+    createPermission.mutate(form);
+  };
+
+  const handleChange = (field: any, value: any) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleBlur = (field: any) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
   };
 
   return (
@@ -58,9 +96,11 @@ export function PermissionsContent() {
         onOpenChange={setOpen}
         onSubmit={handleRegister}
         loading={loading}
-        value={{ name: "", description: "" }}
-        onChange={() => {}}
-        onBlur={() => {}}
+        value={form}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        errors={errors}
+        touched={touched}
       />
     </div>
   );
